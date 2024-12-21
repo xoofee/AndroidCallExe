@@ -1,3 +1,4 @@
+#include <jni.h>
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -95,7 +96,45 @@ void start_server() {
     close(server_sock);
 }
 
-int main() {
+extern "C" int main(int argc, char** argv) {
+    std::cout << "Library main function called!" << std::endl;
+    std::cout << "argc = " << argc << ", argv = ";
+    for (int i = 0; i < argc; ++i) {
+        std::cout << argv[i] << " ";
+    }
+    std::cout << std::endl;
+
     start_server();
-    return 0;
+    return 0; // Return status
+}
+
+
+#include <jni.h>
+#include <string.h>
+#include <stdio.h>
+
+// Native function implementation
+extern "C" JNIEXPORT jint JNICALL Java_com_example_myapplication4_MainActivity_foo(JNIEnv *env, jobject thiz, jint argc, jobjectArray argv) {
+    // Convert the Java String array to a C-style string array (char **argv)
+    char **c_argv = new char*[argc];
+
+    for (int i = 0; i < argc; i++) {
+        jstring jstr = (jstring) env->GetObjectArrayElement(argv, i);
+        const char *c_str = env->GetStringUTFChars(jstr, NULL);
+        c_argv[i] = strdup(c_str);  // Convert each Java string to a C string
+        env->ReleaseStringUTFChars(jstr, c_str);
+    }
+
+    // Now, you can call your actual `foo` function (from libhttp.so)
+    // Assuming you have a `foo` function in the C library (libhttp.so) like this:
+    int result = main(argc, c_argv);  // Call your function
+
+    // Clean up
+    for (int i = 0; i < argc; i++) {
+        free(c_argv[i]);
+    }
+    delete[] c_argv;
+
+    // Return the result of `foo`
+    return result;
 }

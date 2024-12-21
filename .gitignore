@@ -13,4 +13,7 @@
 .externalNativeBuild
 .cxx
 local.properties
-app/src/main/assets/http
+app/src/main/assets/
+callexe/build/
+http/build/
+app/src/main/jniLibs/arm64-v8a/libhttp.so
