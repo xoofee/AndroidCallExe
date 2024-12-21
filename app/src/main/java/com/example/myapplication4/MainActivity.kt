@@ -24,7 +24,7 @@ import com.example.myapplication4.ui.theme.MyApplication4Theme
 class MainActivity : ComponentActivity() {
 
     init {
-        System.loadLibrary("http") // Load the native library "libhttp.so"
+        System.loadLibrary("osrm-routed") // Load the native library "libhttp.so"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,7 +35,7 @@ class MainActivity : ComponentActivity() {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Greeting(
                         modifier = Modifier.padding(innerPadding),
-                        foo = { argc, argv -> foo(argc, argv) }
+                        cmain = { argc, argv -> cmain(argc, argv) }
                     )
                 }
             }
@@ -43,11 +43,11 @@ class MainActivity : ComponentActivity() {
     }
 
     // Declare the native function foo
-    external fun foo(argc: Int, argv: Array<String>): Int
+    external fun cmain(argc: Int, argv: Array<String>): Int
 }
 
 @Composable
-fun Greeting(modifier: Modifier = Modifier, foo: (Int, Array<String>) -> Int) {
+fun Greeting(modifier: Modifier = Modifier, cmain: (Int, Array<String>) -> Int) {
     var text by remember { mutableStateOf("Hello Android!") }
 
     // Column to arrange the Text and Button vertically
@@ -64,7 +64,7 @@ fun Greeting(modifier: Modifier = Modifier, foo: (Int, Array<String>) -> Int) {
         // Button to change the text and call the native function
         Button(onClick = {
             val argv = arrayOf("arg1", "arg2", "arg3")
-            val result = foo(argv.size, argv) // Call the native function
+            val result = cmain(argv.size, argv) // Call the native function
 
             // Update the UI text with the result
             text = "JNI Result: $result"
